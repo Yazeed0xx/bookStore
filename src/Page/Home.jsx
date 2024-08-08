@@ -3,10 +3,12 @@ import axios from 'axios';
 import { Link } from 'react-router-dom';
 import Nav from './Nav';
 import Fot from './Fot';
+import { useSelector } from 'react-redux';
 
 function Home() {
   const [newReleases, setReleases] = useState([]);
   const [Index, setIndex] = useState(0);
+  const filter = useSelector((state) => state.productFilter.filter.toLowerCase());
 
   useEffect(() => {
     fetchNewReleases();
@@ -25,6 +27,9 @@ function Home() {
       console.error('Error fetching new releases:', error);
     }
   };
+  const homeFavorites = newReleases.filter((book) =>
+    book.title.toLowerCase().includes(filter)
+  );
 
   return (
     <>
@@ -46,14 +51,14 @@ function Home() {
           </Link>
         </div>
 
-        <div className="md:flex p-2 md:space-x-6 md:items-start">
-          <div className="md:w-1/3 hidden md:block">
+        <div className="md:flex max-md:w-[750px] max-md:flex-wrap max-md:justify-center p-2 bg md:space-x-6 md:items-start">
+          <div className="md:w-1/3  ">
             <div className="mb-8 overflow-hidden">
               <div className="carousel" data-autoplay="true" data-delay="5000">
                 {newReleases.map((book, index) => (
                   <div
                     key={book.rank}
-                    className={`carousel-item flex  bg-red-600 ${index === Index ? 'active' : 'hidden'}`}
+                    className={`carousel-item flex   ${index === Index ? 'active' : 'hidden'}`}
                   >
                     <img
                       src={book.book_image}
@@ -67,9 +72,9 @@ function Home() {
             </div>
           </div>
 
-          <div className="md:w-2/3  grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {newReleases.map((book) => (
-              <div key={book.rank} className="bg-white shadow-lg rounded-lg overflow-hidden">
+          <div className="md:w-2/3  grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4   gap-8">
+            {homeFavorites.map((book) => (
+              <div key={book.rank} className="bg-white shadow-lg rounded-lg overflow-hidden max-md:w-[350px]  ">
                 <img src={book.book_image} alt={book.title} className="h-64 w-full object-cover" />
                 <div className="p-4">
                   <h3 className="text-lg font-bold">{book.title}</h3>

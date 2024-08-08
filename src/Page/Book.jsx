@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Nav from './Nav';
 import { Link } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 
 function Book() {
   const [books, setBooks] = useState([]);
@@ -9,7 +10,7 @@ function Book() {
   const [favorites, setFavorites] = useState([]);
   const [read, setRead] = useState([]);
 
-  const [filteredBooks, setFilteredBooks] = useState([]);
+  const filter = useSelector((state) => state.productFilter.filter.toLowerCase());
 
   useEffect(() => {
     getBooks();
@@ -22,7 +23,6 @@ function Book() {
       .then((response) => {
         console.log(response.data);
         setBooks(response.data.results.books);
-        setFilteredBooks(response.data.results.books); 
       })
       .catch((error) => {
         console.error('Error fetching books:', error);
@@ -54,42 +54,39 @@ function Book() {
       localStorage.setItem('userRead', JSON.stringify(updatedRead));
     }
   };
-
-  const handleSearchClick = () => {
-    const filtered = books.filter((book) =>
-      book.title.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-    setFilteredBooks(filtered);
-  };
+  const filteredBooks = books.filter((book) =>
+    book.title.toLowerCase().includes(filter)
+  );
+ 
 
   return (
     <>
-      <Nav searchTerm={searchTerm} setSearchTerm={setSearchTerm} onSearch={handleSearchClick} />
+      <Nav  />
       <div className="container mx-auto py-8">
         <h1 className="text-3xl font-bold mb-6 text-gray-800">Books</h1>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6  justify-items-center">
           {filteredBooks.length > 0 ? (
             filteredBooks.map((book) => (
-              <div key={book.rank} className="bg-white shadow-lg rounded-lg overflow-hidden">
+              <div key={book.rank} className="bg-white flex-col  shadow-lg rounded-lg overflow-hidden max-md:w-[250px] max-md:items-center">
                 <img src={book.book_image} alt={book.title} className="h-64 w-full object-cover rounded-t-lg" />
-                <div className="p-3 w-full h-full">
+                <div className="p-3 w-full h-full flex-col gap-20  ">
                   <h2 className="text-lg font-bold mb-2 text-gray-900">{book.title}</h2>
                   {/* <p className="text-sm text-gray-800">{book.description}</p> */}
-                  <div className="mt-4 flex flex-wrap  justify-between items-center">
+                  <div className="mt-4 flex-row  justify-between ">
                     <div>
                       {!favorites.find((b) => b.rank === book.rank) ? (
                         <button onClick={() => addToFavorites(book)} className="btn btn-info mr-2 text-sm">
                           Add to Favorites
                         </button>
                       ) : (
-                        <span className="text-green-500">Added to Favorites</span>
+                        <span className="text-green-500    ">Added to Favorites</span>
                       )}
                       {!read.find((b) => b.rank === book.rank) ? (
-                        <button onClick={() => addToRead(book)} className="btn  mr-2 text-sm">
+                        <button onClick={() => addToRead(book)} className="btn   mr-2 text-sm">
                           Add to Read
                         </button>
                       ) : (
-                        <span className="text-green-500">Added to Read</span>
+                        <span className="text-green-500 ml-10  ">Added to Read</span>
                       )}
                     </div>
                    
